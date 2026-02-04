@@ -1,25 +1,122 @@
+
+
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Digital Library</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Book Recommender</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; font-size: 2.5em; }
+        
+        .filter-bar { text-align: center; margin-bottom: 30px; }
+        select { padding: 10px 20px; font-size: 16px; border: none; border-radius: 25px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; }
+        
+        #bookGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .book-card { 
+            background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            cursor: pointer; transition: all 0.3s ease; position: relative;
+        }
+        .book-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .genre-badge {
+            position: absolute; top: 15px; right: 15px; padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
+            color: white; z-index: 2;
+        }
+        .genre-thriller { background: #e74c3c; }
+        .genre-romance { background: #e91e63; }
+        .book-card img { width: 100%; height: 350px; object-fit: cover; transition: transform 0.3s; }
+        .book-card:hover img { transform: scale(1.05); }
+        .book-card h3 { padding: 20px; font-size: 1.2em; color: #333; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: white; margin: 5% auto; padding: 0; border-radius: 20px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-button { position: absolute; right: 20px; top: 20px; font-size: 30px; font-weight: bold; cursor: pointer; color: #999; }
+        .close-button:hover { color: #333; }
+        .modal-body { padding: 60px 40px 40px; }
+        #modalTitle { font-size: 2em; margin-bottom: 15px; color: #333; }
+        #modalDescription { line-height: 1.6; color: #666; font-size: 1.1em; }
+        
+        .hidden { display: none !important; }
+        .loading { opacity: 0.6; }
+        @media (max-width: 768px) { #bookGrid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; } }
+    </style>
 </head>
 <body>
-
-    <h1>Personal Library</h1>
-
-    <div class="book-grid" id="bookGrid"></div>
-
+    <div class="container">
+        <h1>📚 Book Recommender</h1>
+        <div class="filter-bar">
+            <select id="genreFilter">
+                <option value="all">All Genres</option>
+                <option value="thriller">Thrillers</option>
+                <option value="romance">Romance</option>
+            </select>
+        </div>
+        <div id="bookGrid"></div>
+    </div>
+    
     <div id="summaryModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <h2 id="modalTitle">Book Title</h2>
-            <p id="modalDescription">Summary goes here...</p>
+            <div class="modal-body">
+                <h2 id="modalTitle"></h2>
+                <p id="modalDescription"></p>
+            </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const books = [ /* Your exact books array here - unchanged */ ];
+        
+        const bookGrid = document.getElementById('bookGrid');
+        const modal = document.getElementById('summaryModal');
+        const closeBtn = document.querySelector('.close-button');
+        const genreFilter = document.getElementById('genreFilter');
+        
+        function renderBooks(filter = 'all') {
+            bookGrid.classList.add('loading');
+            bookGrid.innerHTML = '';
+            
+            const filteredBooks = filter === 'all' ? books : books.filter(book => book.genre.toLowerCase() === filter);
+            
+            filteredBooks.forEach(book => {
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.innerHTML = `
+                    <span class="genre-badge ${book.genre.toLowerCase()}">${book.genre}</span>
+                    <img src="${book.cover}" alt="${book.title}" onerror="this.src='https://via.placeholder.com/300x350/667eea/ffffff?text=No+Cover'">
+                    <h3>${book.title}</h3>
+                `;
+                
+                card.onclick = () => {
+                    document.getElementById('modalTitle').innerText = book.title;
+                    document.getElementById('modalDescription').innerText = book.summary;
+                    modal.style.display = 'block';
+                };
+                
+                bookGrid.appendChild(card);
+            });
+            
+            bookGrid.classList.remove('loading');
+        }
+        
+        // Initial render
+        renderBooks();
+        
+        // Filter handler
+        genreFilter.onchange = (e) => renderBooks(e.target.value);
+        
+        // Modal handlers (unchanged)
+        closeBtn.onclick = () => modal.style.display = 'none';
+        window.onclick = (event) => {
+            if (event.target === modal) modal.style.display = 'none';
+        };
+    </script>
 </body>
-</html>
+    </html>
