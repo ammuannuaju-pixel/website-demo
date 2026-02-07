@@ -372,12 +372,6 @@ function createBookCard(book) {
             <p class="book-summary">${book.summary}</p>
         </div>
     `;
-    
-    return card;
-}
 
-// Initialize - show genre page on load
-genrePage.classList.add('active');
-}
 
 
