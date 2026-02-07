@@ -378,3 +378,43 @@ function createBookCard(book) {
 
 // Initialize - show genre page on load
 genrePage.classList.add('active');
+
+import React, { useState } from 'react';
+
+//
+
+export default function BookList() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredBooks = books.filter(book =>
+    book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    book.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search by book or author..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="search-bar"
+      />
+
+      <div className="book-list">
+        {filteredBooks.length > 0 ? (
+          filteredBooks.map((book) => (
+            <div className="book-card" key={book.title}>
+              <img src={book.image} alt={book.title} />
+              <h4>{book.title}</h4>
+              <p><strong>{book.author}</strong></p>
+              <p>{book.summary}</p>
+            </div>
+          ))
+        ) : (
+          <p>No books found.</p>
+        )}
+      </div>
+    </div>
+  );
+                                            }
